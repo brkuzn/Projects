@@ -1,1 +1,1 @@
-# Projects
+I fit multiple linear regression in this assignment. In the first part, I divided the data into two as test and train. I also added the Quadratic Model and compared the two models (in terms of their MSEs). I used the Anova function. In the second part, using the Boston House Dataset, I took the crime rate by town as a dependent variable and fitted a multiple linear regression. In the third part, using the womennames dataset, I observed the popularity of women's names in Turkey and the change over the years.
