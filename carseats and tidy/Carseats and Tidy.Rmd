@@ -1,0 +1,171 @@
+---
+title: "Carseats And Tidy"
+author: "brkuzn"
+date: "05 06 2021"
+output: html_document
+---
+
+#1
+Variables (GDPpc, RGDPpc, GDPpc_USD and population) are in the rows in "data2010.xls" and "data2015.xls". Data sets should contain province, id, year, GDPpc, RGDPpc, GDPpc_USD and population in the columns
+```{r}
+library(readxl)
+library(tidyverse)
+library(tidyr)
+data2010 <- read_excel("data2010.xls") 
+data2010
+data2010_manipultd <- pivot_wider(data2010, names_from = variable, values_from = y2010)
+data2010_manipultd
+#2015
+data2015 <- read_excel("data2015.xls")
+head(data2015)
+data2015_manipultd <- pivot_wider(data2015, names_from = variable, values_from = y2015)
+data2015_manipultd
+
+```
+#2 we want  to estimate a regression tree using `Sales` in Carseats dataset as the quantitative response variable. Do the following: 
+
+a. Split the data set into train and test sets (half-half). Using only the train 
+data, fit a decision tree and plot. What is the test MSE? 
+
+b. Using CV, determine the optimal level of tree complexity. Based on the 
+pruned tree, compute the test MSE and compare to the previous part. 
+```{r}
+library(ISLR)
+library(tree)
+set.seed(123)
+traindata <- sample(1:nrow(Carseats), nrow(Carseats)/2)
+car_train <- Carseats[traindata, ]
+car_test <- Carseats[-traindata, ]
+
+tree1 <- tree(Sales ~ ., data = car_train)
+summary(tree1)
+plot(tree1)
+text(tree1, pretty = 0)
+pred1 <- predict(tree1, newdata = car_test)
+mean((pred1 - car_test$Sales)^2)
+#MSE is 4.395357.
+#b
+set.seed(100)
+cv.car <- cv.tree(tree1)
+par(mfrow = c(1, 2))
+plot(cv.car$size, cv.car$dev, type = "b")
+plot(cv.car$k, cv.car$dev, type = "b")
+
+par(mfrow = c(1,1))
+
+
+pr1 <- prune.tree(tree1, best = 7)
+plot(pr1)
+text(pr1, pretty = 0)
+
+pred.prune <- predict(pr1, newdata = car_test)
+mean((pred.prune - car_test$Sales)^2)
+
+#MSE was slightly higher after pruning, we can say that it was slightly better in the first case.(MSE = 4.696596)
+
+```
+#3
+Continue using the data set from the previous question. This time, 
+
+a. Apply the bagging approach to estimate the decision tree. Compute the test MSE. 
+Plot the variable importance graph and interpret. 
+
+b. Apply the random forest approach to estimate the decision tree. Compute the test MSE.
+How did you choose the number of variables considered at each split (mtry)? 
+Plot the variable importance graph and interpret. 
+```{r}
+library(randomForest)
+set.seed(3)
+airbag <- randomForest(Sales ~ ., data = Carseats, subset = traindata, mtry = 10,
+                        importance = TRUE)
+predbag <- predict(airbag, newdata = car_test)
+mean((predbag - car_test$Sales)^2)
+varImpPlot(airbag)
+importance(airbag)
+
+#Pricing of a competitive company in the same region is important. Age, income and advertising are also important, but the most important predictors are shelving location of car seats and price.
+
+
+
+# Let's check the MSEs for each split.
+
+
+
+set.seed(3)
+
+airbag1 <- randomForest(Sales ~ ., data = Carseats, subset = traindata, mtry = 1,
+                        importance = TRUE)
+
+predbag1 <- predict(airbag1, newdata = car_test)
+mean((predbag1 - car_test$Sales)^2)
+
+set.seed(3)
+airbag2 <- randomForest(Sales ~ ., data = Carseats, subset = traindata, mtry = 2,
+                        importance = TRUE)
+
+predbag2 <- predict(airbag2, newdata = car_test)
+mean((predbag2- car_test$Sales)^2)
+
+
+set.seed(3)
+airbag3 <- randomForest(Sales ~ ., data = Carseats, subset = traindata, mtry = 3,
+                       importance = TRUE)
+
+predbag3 <- predict(airbag3, newdata = car_test)
+mean((predbag3 - car_test$Sales)^2)
+
+set.seed(3)
+airbag4 <- randomForest(Sales ~ ., data = Carseats, subset = traindata, mtry = 4,
+                        importance = TRUE)
+
+predbag4 <- predict(airbag4, newdata = car_test)
+mean((predbag4 - car_test$Sales)^2)
+
+
+set.seed(3)
+airbag5 <- randomForest(Sales ~ ., data = Carseats, subset = traindata, mtry = 5,
+                        importance = TRUE)
+
+predbag5 <- predict(airbag5, newdata = car_test)
+mean((predbag5 - car_test$Sales)^2)
+
+set.seed(3)
+airbag6 <- randomForest(Sales ~ ., data = Carseats, subset = traindata, mtry = 6,
+                        importance = TRUE)
+
+predbag6 <-predict(airbag6, newdata = car_test)
+mean((predbag6 - car_test$Sales)^2)
+
+
+set.seed(3)
+airbag7 <- randomForest(Sales ~ ., data = Carseats, subset = traindata, mtry = 7,
+                        importance = TRUE)
+
+predbag7 <-predict(airbag7, newdata = car_test)
+mean((predbag7 - car_test$Sales)^2)
+
+
+set.seed(3)
+airbag8 <- randomForest(Sales ~ ., data = Carseats, subset = traindata, mtry = 8,
+                        importance = TRUE)
+
+predbag8 <-predict(airbag8, newdata = car_test)
+mean((predbag8 - car_test$Sales)^2)
+
+#As the number of variables randomly sampled in each compartment increases, the MSE decreases.
+
+
+set.seed(3)
+airbag9 <- randomForest(Sales ~ ., data = Carseats, subset = traindata, mtry = 9,
+                        importance = TRUE)
+
+predbag9 <-predict(airbag9, newdata = car_test)
+mean((predbag9 - car_test$Sales)^2)
+
+set.seed(3)
+airbag10 <- randomForest(Sales ~ ., data = Carseats, subset = traindata, mtry = 10,
+                        importance = TRUE)
+predbag10 <-predict(airbag10, newdata = car_test)
+mean((predbag10 - car_test$Sales)^2)
+```
+
