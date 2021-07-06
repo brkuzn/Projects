@@ -1,1 +1,1 @@
-
+I am using lifedata2015 data. Here I am trying to determine the model with the most optimal number of variables by using Cp and BIC criteria to predict the "happiness _level" response variables. Thanks to this approach, I understand how many of these 40 variables are useful.
