@@ -1,0 +1,199 @@
+---
+title: "Homework 1"
+subtitle: Machine Learning in Economics
+author: "Prof. Dr. Hüseyin Taştan"
+date: "Due: next week April 8th, 2021"
+output: 
+  html_document:
+    number_sections: false
+    theme: flatly
+    highlight: haddock  
+    toc: yes
+    toc_depth: 3
+    toc_float: yes 
+---
+```{css, echo=FALSE}
+body{
+  background-color: #FAFAFA;
+    font-size: 18px;
+  line-height: 1.8;
+}
+code.r{
+  font-size: 16px;
+}
+```
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+NAME & SURNAME:BURAK UZUN
+NO:18035028
+
+**Arrange your answers in an `.Rmd` file (you can take `HW01_MLinEcon.Rmd` as a template) and produce a html file containing your answers. You need to upload your files to the Google Classroom by the deadline.**
+
+
+--------------------------------------------------------
+
+# Part 1
+
+## Question 
+
+In this exercise you will simulate a data set and run a simple regression. To ensure reproducible results, make sure you use `set.seed(1)`. This exercise is similar to the one we saw in class (see [regression lab](https://raw.githack.com/htastan/Machine-Learning-in-Economics/main/Labs/Lab-04-Regression.html#4_test_and_training_mse_revisited)).   
+
+a. Using the `rnorm()` function create vector $X$ that contains 200 observations from `N(0,1)` distribution. 
+
+b. Similarly, create a 200 element vector, `epsilon` ($\epsilon$), drawn from `N(0,0.25)` distribution. This is the irreducible error. 
+
+c. Create the response data using the following relationship: 
+$$
+Y = -1 + 0.5 X + \epsilon 
+$$
+d. Now using your simulated data set, fit a linear regression of Y on X using `lm()` function. Display the summary statistics and interpret the diagnostic plots. In a single graph, 
+draw a scatter diagram of Y and X values, and the fitted line. 
+
+e. Now, fit a quadratic model by adding the $X^2$ into the model. Discuss whether there is improvement in the fit or not. Draw scatter diagram and fitted line similar to the previous part. Interpret the diagnostic plots. 
+
+f. Using the `sample()` function  create train and test sets just like we did in class. 
+Obtain predicted values (from the test set) for the linear and quadratic fits. Compare their MSEs. Which model is better in terms of predictions? 
+
+
+## Answer
+
+Put your answers, explanations, interpretations here. 
+
+
+You can fill in the following code chunk.
+
+```{r, echo = TRUE, results = 'hold'}
+library(ggplot2)
+library(broom)
+library(tidyr)
+library(tidyverse)
+library(dplyr)
+set.seed(1)
+n      <- 200
+set.seed(1)
+x <- rnorm(n, mean = 0, sd = 1)
+epsilon <- rnorm(n, mean = 0, sd = 0.25)
+y = -1 + 0.5*x + rnorm(n, mean = 0, sd = 0.25)
+reg1 <- lm(formula = y ~ x)
+tidy(reg1)
+par(mfrow=c(2,2))
+plot(reg1)
+ggplot(reg1, aes(x = x, y = y)) + geom_point() + geom_smooth(method = "lm", se = FALSE)
+reg2 <- lm(formula = y~x + I(x^2))
+anova(reg1, reg2)
+ggplot(reg2, aes(x = x, y = y)) +geom_point() + geom_smooth(method = "lm", se = FALSE)
+par(mfrow=c(2,2))
+plot(reg2)
+set.seed(1)
+df1 <- tibble(id=1:n, y, x)
+train <- sample(n, 100)
+train_data <- df1[train, ]
+test_data <- df1[-train, ]
+lfit <- lm(y ~ x, data = train_data)
+qfit <- lm(y ~ x, I(x^2), data = train_data)
+lin_predict <- predict(lfit, test_data)
+lin_error <- test_data$y - lin_predict
+MSE_lfit <- mean(lin_error^2)
+MSE_lfit
+qupredict <- predict(qfit, test_data)
+querror <- test_data$y - qupredict
+MSE_qfit <- mean(querror^2)
+MSE_qfit
+```
+e.Quadratic model is not better according to F test from anova function.
+
+
+f. It looks like test MSE = 0.0598797 from the linear model and MSE = 0.059424 for the quadratic model. The difference is very small, 0.0004560702. It looks like we can use both models in our predictions.
+
+----------------------------------------------------------------
+
+
+# Part 2
+
+
+## Question 
+
+Boston house data set (part of `MASS` package) that we saw in class  has a variable that measures per capita crime rate by town (`crim`). Now suppose that the `crim` is the response variable and all the remaining variables are features. Fit a multiple linear regression model and interpret the results. 
+
+## Answer
+
+```{r}
+# put your code here
+library(MASS)
+regboston <- lm(formula = crim ~ . , data = Boston)
+summary(regboston)
+names(regboston)
+coef(regboston)
+confint(regboston)
+par(mfrow=c(2,2))
+plot(regboston)
+
+
+
+```
+
+
+----------------------------------------------------------------
+
+# Part 3
+
+## Question
+Prepare a simple table that shows the most popular women's names in Turkey in 2018 (see the example we discussed in class). Prepare a similar table for the year 2017 and compare the two tables. Are there any differences?
+
+## Answer
+
+```{r}
+# put your code here
+# the data set is already available in the HW project folder 
+# you can read it into R using: 
+library(tidyverse)
+library(readxl)
+womennames2018 <- read_excel("womennames2018.xls", range = "A4:AQ338")
+head(womennames2018) 
+womennames2018 <- rename(womennames2018, "name"="...1")
+head(womennames2018)
+womennames <- womennames2018 %>%
+ pivot_longer(-name, names_to="year", values_to = "rank")
+womennames %>%
+  arrange(year, name) %>%
+  head(10)
+top10_2018 <- womennames %>% 
+  filter(year==2018, rank<11) %>% 
+  arrange(rank)
+top10_2018
+top10_2017 <- womennames %>% 
+  filter(year==2017,rank<11) %>% 
+  arrange(rank)
+top10_2017
+top10 <- full_join(top10_2017, top10_2018)
+top10
+top10 %>%  
+  mutate(Name = factor(name), Rank = factor(rank), Year=factor(year)) %>%  
+  ggplot(aes(x=reorder(name,-rank), Rank, fill=Year)) +
+  geom_bar(position=position_dodge(), stat = "identity") +
+  xlab("") +
+  coord_flip()
+
+
+  
+
+  
+
+```
+
+
+```{r eval=FALSE, warning=FALSE, include=FALSE}
+# rename the first column 
+womennames2018 <- rename(womennames2018, "name"="...1")
+head(womennames2018)
+```
+
+See the example in [Introduction to the R Tidyverse](https://raw.githack.com/htastan/Machine-Learning-in-Economics/main/Labs/Lab-03-Intro-to-R-Tidyverse.html#7_application:_how_popular_is_your_name)
+ 
+ 
+ 
+There are a total of 12 names in top 10 in years 2017 and 2018. Zeynep, Elif, and Defne are in the top 3, respectively, in both years. Ecrin and Azra were in the top 10 in 2017 but not in 2018. We see that Asel and Meryem entered the top 10 in 2018 at 7th and 8th places, respectively. Miray and Zehra became less popular as they went from the 8th to 9th and 7th to 10th places, respectively. Ebrar and Eylül, on the other, became more popular.
+
+
+<div class="tocify-extend-page" data-unique="tocify-extend-page" style="height: 0;"></div>
