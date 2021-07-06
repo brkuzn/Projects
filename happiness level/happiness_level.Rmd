@@ -1,0 +1,32 @@
+---
+title: "Optimal Variable Number"
+author: "brkuzn"
+date: "13 04 2021"
+output:
+  html_document: default
+  pdf_document: default
+---
+```{r}
+library(leaps)
+load("lifedata2015.RData")
+str(lifedata2015)
+
+reg.fwd <- regsubsets(happiness_level ~ . -province, data = lifedata2015, nvmax=40, method="forward")
+reg.fwd.summary <- summary(reg.fwd)
+reg.bwd <- regsubsets(happiness_level ~ . -province, data = lifedata2015, nvmax=40, method="backward")
+reg.bwd.summary <- summary(reg.bwd)
+reg.bwd.summary
+#Using the Cp criterion best model is
+coef(reg.fwd, which.min(reg.fwd.summary$cp)) 
+#11 variables and intercept
+#Using the BIC criterion the best model is
+coef(reg.fwd, which.min(reg.fwd.summary$bic)) 
+plot(reg.fwd, scale="bic")
+bestBIC <- which.min(reg.fwd.summary$bic)
+# There are 5 variables in best BIC criterion model with forward selection method.
+#sat_rate_with_health_status,sat_rate_municipal_clean_serv,murder_rate_per_million, perc_safe_walk_alone_at_night, sat_rate_social_relations.
+```
+
+
+
+
