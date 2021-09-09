@@ -3,8 +3,12 @@ Here I’m using persona.cv dataset. This dataset includes the pricing of a mobi
 *********************************************************************************
 VARIABLES
 *********************************************************************************
-*PRICE - Customer Spend Amount
-*SOURCE - Operating system of the customer's mobile device
-*SEX - Sex
-*COUNTRY - Country where the customer is located
-*AGE - Age of Customer
+**PRICE - Customer Spend Amount
+****************************
+**SOURCE - Operating system of the customer's mobile device
+****************************
+**SEX - Sex
+****************************
+**COUNTRY - Country where the customer is located
+****************************
+**AGE - Age of Customer
