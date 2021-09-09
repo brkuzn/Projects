@@ -2,8 +2,9 @@ This is a project created by VBO. A gaming company wants to create new level bas
 Here I’m using persona.cv dataset. This dataset includes the pricing of a mobile application and its users’ age, nationality, gender. I’m re-observing these variables by creating new and more inclusive personas and segmenting them according to average spending. Thus, we can predict  how much profit we can make from different kinds of customers.
 *********************************************************************************
 VARIABLES
-PRICE - Customer Spend Amount
-SOURCE - Operating system of the customer's mobile device
-SEX - Sex
-COUNTRY - Country where the customer is located
-AGE - Age of Customer
+*********************************************************************************
+*PRICE - Customer Spend Amount
+*SOURCE - Operating system of the customer's mobile device
+*SEX - Sex
+*COUNTRY - Country where the customer is located
+*AGE - Age of Customer
